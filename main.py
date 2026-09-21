@@ -47,30 +47,85 @@ class Tracker:
             self.students.remove(student)
             return True
         return False
+def show_menu():
+    print("\n=== Student Grade Tracker ===")
+    print("1. Add Student")
+    print("2. Add Grade")
+    print("3. View All Students")
+    print("4. Find Student")
+    print("5. Remove Student")
+    print("6. Exit")
+def handle_add_student(tracker):
+    name = input("Enter student name: ")
+    roll = input("Enter roll number: ")
+    if tracker.find_student(roll):
+        print("A student with this roll number already exists!")
+        return
+    tracker.add_student(name, roll)
+    print(f"Student {name} added.")
 
+
+def handle_add_grade(tracker):
+    roll = input("Enter student roll number: ")
+    student = tracker.find_student(roll)
+    if not student:
+        print("Student not found.")
+        return
+    subject = input("Enter subject: ")
+    try:
+        mark = float(input("Enter mark: "))
+    except ValueError:
+        print("Invalid mark. Please enter a number.")
+        return
+    student.add_grade(subject, mark)
+    print(f"Grade added for {student.name}.")
+
+
+def handle_view_all(tracker):
+    students = tracker.list_all()
+    if not students:
+        print("No students yet.")
+        return
+    print("\n--- All Students ---")
+    for s in students:
+        print(s)
+
+
+def handle_find(tracker):
+    roll = input("Enter roll number to find: ")
+    student = tracker.find_student(roll)
+    if student:
+        print(student)
+        print("Grades:", student.grades)
+    else:
+        print("Student not found.")
+
+
+def handle_remove(tracker):
+    roll = input("Enter roll number to remove: ")
+    if tracker.remove_student(roll):
+        print("Student removed.")
+    else:
+        print("Student not found.")
 if __name__ == "__main__":
     tracker = Tracker()
 
-    tracker.add_student("Aisha", "22-SE-01")
-    tracker.add_student("Bob", "22-SE-02")
+    while True:
+        show_menu()
+        choice = input("Choose an option: ")
 
-    # Add grades
-    aisha = tracker.find_student("22-SE-01")
-    aisha.add_grade("Math", 85)
-    aisha.add_grade("Math", 90)
-    aisha.add_grade("Physics", 78)
-
-    bob = tracker.find_student("22-SE-02")
-    bob.add_grade("Math", 75)
-    bob.add_grade("Physics", 88)
-
-    # List everyone
-    print("--- All Students ---")
-    for s in tracker.list_all():
-        print(s)
-
-    # Test remove
-    tracker.remove_student("22-SE-02")
-    print("\n--- After removing Bob ---")
-    for s in tracker.list_all():
-        print(s)
+        if choice == "1":
+            handle_add_student(tracker)
+        elif choice == "2":
+            handle_add_grade(tracker)
+        elif choice == "3":
+            handle_view_all(tracker)
+        elif choice == "4":
+            handle_find(tracker)
+        elif choice == "5":
+            handle_remove(tracker)
+        elif choice == "6":
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice. Try again.")
