@@ -1,3 +1,4 @@
+import json
 class Student:
     def __init__(self, name, roll_number):
         self.name = name
@@ -16,10 +17,39 @@ class Student:
         if not all_marks:
             return 0
         return sum(all_marks) / len(all_marks)
+    def to_dict(self):
+        """Convert this Student to a dictionary for saving."""
+        return {
+            "name": self.name,
+            "roll_number": self.roll_number,
+            "grades": self.grades
+        }
 
+    @staticmethod
+    def from_dict(data):
+        """Create a Student from a dictionary."""
+        student = Student(data["name"], data["roll_number"])
+        student.grades = data["grades"]
+        return student
     def __str__(self):
         return f"{self.name} (Roll: {self.roll_number}) - Avg: {self.average():.2f}"
 class Tracker:
+    def save_to_file(self, filename="students.json"):
+        """Save all students to a JSON file."""
+        data = [student.to_dict() for student in self.students]
+        with open(filename, "w") as f:
+            json.dump(data, f, indent=2)
+        print(f"Saved {len(self.students)} students.")
+
+    def load_from_file(self, filename="students.json"):
+        """Load students from a JSON file if it exists."""
+        try:
+            with open(filename, "r") as f:
+                data = json.load(f)
+            self.students = [Student.from_dict(item) for item in data]
+            print(f"Loaded {len(self.students)} students.")
+        except FileNotFoundError:
+            print("No saved file found. Starting fresh.")
     def __init__(self):
         self.students = []  # list of Student objects
 
@@ -109,6 +139,7 @@ def handle_remove(tracker):
         print("Student not found.")
 if __name__ == "__main__":
     tracker = Tracker()
+    tracker.load_from_file()
 
     while True:
         show_menu()
@@ -125,6 +156,7 @@ if __name__ == "__main__":
         elif choice == "5":
             handle_remove(tracker)
         elif choice == "6":
+            tracker.save_to_file()
             print("Goodbye!")
             break
         else:
